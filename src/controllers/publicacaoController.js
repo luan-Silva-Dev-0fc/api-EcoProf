@@ -3,35 +3,39 @@ const path = require('path');
 const Publicacao = require('../models/Publicacao');
 const Usuario = require('../models/Usuario');
 
-// Configuração do Multer para upload de imagens e vídeos
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/'); // Pasta para armazenar os arquivos
+    cb(null, 'uploads/');
   },
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname);
-    cb(null, Date.now() + ext); // Nome do arquivo será baseado no timestamp
+    cb(null, Date.now() + ext);
   },
 });
 
 const upload = multer({ storage: storage });
 
 exports.criarPublicacao = [
-  upload.single('arquivo'), // Aceitar 1 arquivo (foto ou vídeo)
+  upload.single('arquivo'),
   async (req, res) => {
     try {
       const { conteudo, tipo, usuarioId } = req.body;
 
-      // Verificar se o tipo é "video" e se o arquivo é do YouTube
       let arquivoUrl = '';
+
       if (tipo === 'video') {
         const youtubeRegex = /^(https?\:\/\/)?(www\.youtube\.com|youtu\.be)\/.+$/;
-        if (!youtubeRegex.test(conteudo)) {
-          return res.status(400).json({ erro: 'Somente vídeos do YouTube são permitidos.' });
+
+        if (youtubeRegex.test(conteudo)) {
+          arquivoUrl = conteudo; // vídeo via link
+        } else if (req.file) {
+          arquivoUrl = `/uploads/${req.file.filename}`; // vídeo da galeria
+        } else {
+          return res.status(400).json({ erro: 'Nenhum vídeo fornecido.' });
         }
-        arquivoUrl = conteudo; // Armazenar o link do vídeo
+
       } else {
-        arquivoUrl = req.file ? `/uploads/${req.file.filename}` : ''; // Se não for vídeo, usar o caminho do arquivo
+        arquivoUrl = req.file ? `/uploads/${req.file.filename}` : '';
       }
 
       const nova = await Publicacao.create({
