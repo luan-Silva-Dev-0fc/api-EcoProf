@@ -5,6 +5,7 @@ const Usuario = require('../models/Usuario');
 exports.cadastrar = async (req, res) => {
   try {
     const { nome, email, senha, confirmarSenha, genero } = req.body;
+
     if (!nome || !email || !senha || !confirmarSenha || !genero) {
       return res.status(400).json({ erro: 'Todos os campos são obrigatórios' });
     }
@@ -84,7 +85,7 @@ exports.deletar = async (req, res) => {
       return res.status(404).json({ erro: 'Usuário não encontrado' });
     }
 
-    await Usuario.destroy({ where: { id } });
+    await usuario.destroy(); // importante para o CASCADE funcionar
     res.status(204).end();
   } catch (err) {
     console.error('Erro ao deletar usuário:', err);

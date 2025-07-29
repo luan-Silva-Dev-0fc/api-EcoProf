@@ -1,22 +1,21 @@
-module.exports = (sequelize, DataTypes) => {
-  const Publicacao = sequelize.define('Publicacao', {
-    texto: {
-      type: DataTypes.STRING,
-      allowNull: true, // Pode ser nulo
-    },
-    link: {
-      type: DataTypes.STRING,
-      allowNull: true, // Pode ser nulo
-    },
-    foto: {
-      type: DataTypes.STRING,
-      allowNull: true, // Pode ser nulo
-    },
-    video: {
-      type: DataTypes.STRING,
-      allowNull: true, // Pode ser nulo
-    }
-  });
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/database');
+const Usuario = require('./Usuario');
 
-  return Publicacao;
-};
+const Publicacao = sequelize.define('Publicacao', {
+  conteudo: {
+    type: DataTypes.TEXT,
+    allowNull: false
+  },
+  tipo: {
+    type: DataTypes.STRING // 'texto', 'foto', 'video'
+  },
+  arquivoUrl: {
+    type: DataTypes.STRING
+  }
+});
+
+Usuario.hasMany(Publicacao, { foreignKey: 'usuarioId' });
+Publicacao.belongsTo(Usuario, { foreignKey: 'usuarioId' });
+
+module.exports = Publicacao;

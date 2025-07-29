@@ -4,32 +4,32 @@ const sequelize = require('../config/database');
 const Usuario = sequelize.define('Usuario', {
   nome: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: false
   },
   email: {
     type: DataTypes.STRING,
-    unique: true,
     allowNull: false,
+    unique: true
   },
   senha: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: false
   },
   foto: {
     type: DataTypes.STRING,
-    allowNull: true,
+    allowNull: true
   },
   genero: {
     type: DataTypes.STRING,
-    allowNull: true, // Gênero é opcional
+    allowNull: true
   },
   createdAt: {
     type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW,
+    defaultValue: DataTypes.NOW
   },
   updatedAt: {
     type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW,
+    defaultValue: DataTypes.NOW
   }
 });
 
