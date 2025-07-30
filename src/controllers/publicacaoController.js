@@ -19,7 +19,8 @@ exports.criarPublicacao = [
   upload.single('arquivo'),
   async (req, res) => {
     try {
-      const { conteudo, tipo, usuarioId } = req.body;
+      const { conteudo, tipo } = req.body;
+      const usuarioId = req.usuarioId;
 
       let arquivoUrl = '';
 
@@ -27,9 +28,9 @@ exports.criarPublicacao = [
         const youtubeRegex = /^(https?\:\/\/)?(www\.youtube\.com|youtu\.be)\/.+$/;
 
         if (youtubeRegex.test(conteudo)) {
-          arquivoUrl = conteudo; // vídeo via link
+          arquivoUrl = conteudo;
         } else if (req.file) {
-          arquivoUrl = `/uploads/${req.file.filename}`; // vídeo da galeria
+          arquivoUrl = `/uploads/${req.file.filename}`;
         } else {
           return res.status(400).json({ erro: 'Nenhum vídeo fornecido.' });
         }

@@ -1,44 +1,98 @@
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const Usuario = require('../models/Usuario');
+const Publicacao = require('../models/Publicacao');
 
-// Caminho para a pasta 'uploads'
-const uploadsPath = path.join(__dirname, 'uploads');
-
-// Verificar se a pasta 'uploads' existe, e se não, criar
-if (!fs.existsSync(uploadsPath)) {
-  fs.mkdirSync(uploadsPath, { recursive: true });
-  console.log('Pasta "uploads" criada com sucesso.');
-}
-
-// Configuração do multer
+// Configuração de armazenamento do Multer
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, './uploads'); // Define a pasta de destino
+    const uploadPath = path.join(__dirname, '..', 'uploads');
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath, { recursive: true });
+    }
+    cb(null, uploadPath);
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname)); // Cria um nome único para o arquivo
+    const ext = path.extname(file.originalname);
+    cb(null, Date.now() + ext);
   }
 });
 
-// Validação do tipo de arquivo (imagens e vídeos)
-const fileFilter = (req, file, cb) => {
-  const allowedTypes = /jpeg|jpg|png|gif|mp4|avi/;
-  const isValidMimeType = allowedTypes.test(file.mimetype);
-  const isValidExtname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-
-  if (isValidMimeType && isValidExtname) {
-    cb(null, true); // Permite o upload do arquivo
-  } else {
-    cb(new Error('Apenas arquivos de imagem ou vídeo são permitidos.'), false); // Rejeita o upload
-  }
-};
-
-// Limite de 10MB para os arquivos
+// Configuração do Multer para uploads
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // Limite de 10MB
-  fileFilter: fileFilter
+  limits: { fileSize: 5 * 1024 * 1024 }, // Limite de 5MB
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = /jpeg|jpg|png|gif|mp4|avi/;
+    const isValidType = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const isValidMimeType = allowedTypes.test(file.mimetype);
+    if (isValidMimeType && isValidType) {
+      return cb(null, true);
+    } else {
+      return cb(new Error('Apenas imagens e vídeos são permitidos.'));
+    }
+  }
 });
 
-module.exports = upload;
+// Endpoint para atualizar a foto do usuário
+exports.atualizarFotoUsuario = [
+  upload.single('foto'),
+  async (req, res) => {
+    try {
+      const usuarioId = req.usuarioId;
+      const fotoUrl = req.file ? `/uploads/${req.file.filename}` : '';
+
+      const usuario = await Usuario.findByPk(usuarioId);
+      if (!usuario) {
+        return res.status(404).json({ erro: 'Usuário não encontrado' });
+      }
+
+      usuario.foto = fotoUrl;
+      await usuario.save();
+
+      res.status(200).json(usuario);
+    } catch (err) {
+      console.error('Erro ao atualizar foto do usuário:', err);
+      res.status(500).json({ erro: 'Erro ao atualizar foto do usuário' });
+    }
+  }
+];
+
+// Endpoint para criar uma nova publicação
+exports.criarPublicacao = [
+  upload.single('arquivo'),
+  async (req, res) => {
+    try {
+      const { conteudo, tipo } = req.body;
+      const usuarioId = req.usuarioId;
+
+      let arquivoUrl = '';
+
+      if (tipo === 'video') {
+        const youtubeRegex = /^(https?\:\/\/)?(www\.youtube\.com|youtu\.be)\/.+$/;
+        if (youtubeRegex.test(conteudo)) {
+          arquivoUrl = conteudo;
+        } else if (req.file) {
+          arquivoUrl = `/uploads/${req.file.filename}`;
+        } else {
+          return res.status(400).json({ erro: 'Nenhum vídeo fornecido.' });
+        }
+      } else {
+        arquivoUrl = req.file ? `/uploads/${req.file.filename}` : '';
+      }
+
+      const novaPublicacao = await Publicacao.create({
+        conteudo,
+        tipo,
+        arquivoUrl,
+        usuarioId
+      });
+
+      res.status(201).json(novaPublicacao);
+    } catch (err) {
+      console.error('Erro ao criar publicação:', err);
+      res.status(500).json({ erro: 'Erro ao criar publicação' });
+    }
+  }
+];
