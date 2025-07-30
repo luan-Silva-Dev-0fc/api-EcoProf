@@ -3,9 +3,12 @@ const express = require('express');
 const cors = require('cors');
 const usuarioRoutes = require('./src/routes/usuarioRoutes');
 const publicacaoRoutes = require('./src/routes/publicacaoRoutes');
+const perfilRoutes = require('./src/routes/perfilRoutes');
+const destruirPerfilRoutes = require('./src/routes/destruirPerfilRoutes');
+const atualizarPerfilRoutes = require('./src/routes/atualizarPerfilRoutes');
+
+
 const sequelize = require('./src/config/database');
-
-
 
 const app = express();
 
@@ -15,6 +18,10 @@ app.use('/uploads', express.static('uploads'));
 
 app.use('/usuario', usuarioRoutes);
 app.use('/publicacao', publicacaoRoutes);
+app.use('/perfil', perfilRoutes); 
+app.use('/destruir-perfil', destruirPerfilRoutes);
+app.use('/atualizar-perfil', atualizarPerfilRoutes);
+
 
 const syncDatabase = async () => {
   try {
