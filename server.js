@@ -6,6 +6,7 @@ const publicacaoRoutes = require('./src/routes/publicacaoRoutes');
 const perfilRoutes = require('./src/routes/perfilRoutes');
 const destruirPerfilRoutes = require('./src/routes/destruirPerfilRoutes');
 const atualizarPerfilRoutes = require('./src/routes/atualizarPerfilRoutes');
+const linkRoutes = require('./src/routes/linkRoutes');
 
 
 const sequelize = require('./src/config/database');
@@ -21,6 +22,7 @@ app.use('/publicacao', publicacaoRoutes);
 app.use('/perfil', perfilRoutes); 
 app.use('/destruir-perfil', destruirPerfilRoutes);
 app.use('/atualizar-perfil', atualizarPerfilRoutes);
+app.use('/link', linkRoutes);
 
 
 const syncDatabase = async () => {
