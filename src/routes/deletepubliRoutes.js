@@ -1,9 +1,9 @@
-const express = require('express');
-const router = express.Router();
-const { deletarPublicacao } = require('../controllers/publicacaoController');
-const authMiddleware = require('../middleware/auth'); 
+const router = require('express').Router();
+const publicacaoController = require('../controllers/publicacaoController');
+const autenticarUsuario = require('../middleware/auth'); 
 
 
-router.delete('/:id', authMiddleware, deletarPublicacao); 
+
+router.delete('/publicacao/:id', autenticarUsuario, publicacaoController.deletarPublicacao); 
 
 module.exports = router;
