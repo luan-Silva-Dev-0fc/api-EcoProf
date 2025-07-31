@@ -18,6 +18,6 @@ exports.deletarPublicacao = async (req, res) => {
     res.status(200).json({ mensagem: 'Publicação deletada com sucesso' });
   } catch (err) {
     console.error('Erro ao deletar publicação:', err);
-    res.status(500).json({ erro: 'Erro ao deletar publicação' });
+    res.status(500).json({ erro: 'Erro interno do servidor' });
   }
 };
