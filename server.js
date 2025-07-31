@@ -7,26 +7,25 @@ const perfilRoutes = require('./src/routes/perfilRoutes');
 const destruirPerfilRoutes = require('./src/routes/destruirPerfilRoutes');
 const atualizarPerfilRoutes = require('./src/routes/atualizarPerfilRoutes');
 const linkRoutes = require('./src/routes/linkRoutes');
+
+
+
 const sequelize = require('./src/config/database');
 
 const app = express();
 
-const corsOptions = {
-  origin: '*',
-  methods: ['GET', 'POST', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-};
-
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
 
 app.use('/usuario', usuarioRoutes);
 app.use('/publicacao', publicacaoRoutes);
-app.use('/perfil', perfilRoutes);
+app.use('/perfil', perfilRoutes); 
 app.use('/destruir-perfil', destruirPerfilRoutes);
 app.use('/atualizar-perfil', atualizarPerfilRoutes);
 app.use('/link', linkRoutes);
+
+
 
 const syncDatabase = async () => {
   try {
