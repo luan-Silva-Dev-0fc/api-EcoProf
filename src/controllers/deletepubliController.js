@@ -1,33 +1,23 @@
-const { Publicacao } = require('../models/Publicacao');
-const Usuario = require('../models/Usuario');  
+const Publicacao = require('../models/Publicacao');
 
-const deletarPubli = async (req, res) => {
+exports.deletarPublicacao = async (req, res) => {
+  const { id } = req.params;  
+  const usuarioId = req.usuarioId;  
+
   try {
-    const publicacaoId = req.params.id;  // Pega o ID da publicação
-    const usuarioId = req.usuarioId;    // Pega o ID do usuário autenticado do token
-
-    // Verificar se o usuário existe
-    const usuario = await Usuario.findByPk(usuarioId);
-    if (!usuario) {
-      return res.status(404).json({ error: 'Usuário não encontrado.' });
-    }
-
-    // Verificar se a publicação existe e se o usuário é o dono
-    const publicacao = await Publicacao.findOne({
-      where: { id: publicacaoId, usuarioId: usuarioId }
-    });
+   
+    const publicacao = await Publicacao.findOne({ where: { id, usuarioId } });
 
     if (!publicacao) {
-      return res.status(404).json({ error: 'Publicação não encontrada ou você não tem permissão para deletar.' });
+      return res.status(404).json({ erro: 'Publicação não encontrada ou não pertence a este usuário.' });
     }
 
-    // Deletar a publicação
+    // Deleta a publicação
     await publicacao.destroy();
-    return res.status(200).json({ message: 'Publicação deletada com sucesso.' });
-  } catch (error) {
-    console.error('Erro ao deletar publicação:', error);
-    return res.status(500).json({ error: 'Erro interno do servidor.' });
+
+    res.status(200).json({ mensagem: 'Publicação deletada com sucesso.' });
+  } catch (err) {
+    console.error('Erro ao deletar a publicação:', err);
+    res.status(500).json({ erro: 'Erro ao deletar a publicação.' });
   }
 };
-
-module.exports = { deletarPubli };
