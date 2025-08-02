@@ -15,4 +15,4 @@ exports.deletarPublicacao = async (req, res) => {
     console.error('Erro ao deletar publicação:', err);
     res.status(500).json({ erro: 'Erro ao deletar publicação' });
   }
-};
+}; // APROVADO

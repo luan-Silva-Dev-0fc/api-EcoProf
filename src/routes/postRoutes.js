@@ -7,3 +7,4 @@ const authMiddleware = require('../middleware/auth');  // Middleware de autentic
 router.delete('/:postId', authMiddleware, deletarPublicacao);
 
 module.exports = router;
+// APROVADO
