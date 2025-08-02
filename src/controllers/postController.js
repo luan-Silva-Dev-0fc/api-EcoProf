@@ -2,10 +2,18 @@ const { Publicacao } = require('../models/Publicacao');
 
 exports.deletarPublicacao = async (req, res) => {
   try {
-    const publicacao = await Publicacao.findByPk(req.params.postId);
+    const usuarioId = req.usuarioId;
+    const postId = req.params.postId;
+
+    const publicacao = await Publicacao.findOne({
+      where: {
+        id: postId,
+        usuarioId: usuarioId
+      }
+    });
 
     if (!publicacao) {
-      return res.status(404).json({ erro: 'Publicação não encontrada' });
+      return res.status(404).json({ erro: 'Publicação não encontrada ou não pertence a você' });
     }
 
     await publicacao.destroy();
@@ -15,4 +23,4 @@ exports.deletarPublicacao = async (req, res) => {
     console.error('Erro ao deletar publicação:', err);
     res.status(500).json({ erro: 'Erro ao deletar publicação' });
   }
-}; // APROVADO
+};
