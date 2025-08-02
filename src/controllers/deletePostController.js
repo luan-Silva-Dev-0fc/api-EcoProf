@@ -5,6 +5,11 @@ const deletePost = async (req, res) => {
   const usuarioId = req.usuarioId;  // ID do usuário autenticado
 
   try {
+    // Verifica se o ID do usuário está presente
+    if (!usuarioId) {
+      return res.status(401).json({ message: 'Usuário não autenticado' });
+    }
+
     // Encontra a publicação pelo ID
     const publicacao = await Publicacao.findOne({ where: { id: postId } });
 
@@ -22,7 +27,8 @@ const deletePost = async (req, res) => {
 
     return res.status(200).json({ message: 'Publicação deletada com sucesso' });
   } catch (error) {
-    return res.status(500).json({ message: 'Erro ao deletar a publicação', error });
+    console.error("Erro ao deletar publicação:", error); // Log do erro para depuração
+    return res.status(500).json({ message: 'Erro ao deletar a publicação', error: error.message });
   }
 };
 
