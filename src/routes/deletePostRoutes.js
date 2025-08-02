@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { deletePost } = require('../controllers/deletePostController');
-const auth = require('../middleware/auth');
+const { deletarPublicacao } = require('../controllers/deletarPublicacaoController');
+const authMiddleware = require('../middleware/auth');  // Middleware de autenticação
 
-router.delete('/:postId', auth, deletePost);
+// Rota para deletar publicação
+router.delete('/:postId', authMiddleware, deletarPublicacao);
 
 module.exports = router;
